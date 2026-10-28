@@ -29,7 +29,7 @@
   <div class="header">
     <h1>付款資訊</h1>
     <p>收款人：林*瑄</p>
-    <div id="status" class="loading">正在更新最新資料...</div>
+    <div id="status" class="loading">正在載入最新收款資料...</div>
   </div>
 
   <!-- 1. iPASS MONEY -->
@@ -47,7 +47,7 @@
     <div class="qr-box">
       <img id="linepay_qr" src="" alt="LINE Pay QR Code">
     </div>
-    <button class="btn" onclick="copyText('linepay_no')">複製 LINE 好友連結</button>
+    <button class="btn" onclick="copyText('linepay_no')">複製 LINE Pay 帳號</button>
   </div>
 
   <!-- 3. 全支付 -->
@@ -63,23 +63,22 @@
 <div id="toast" class="toast">已複製到剪貼簿</div>
 
 <script>
-  // 使用你剛剛提供的標準 Google 試算表 ID
+  // 你的試算表 ID（加上 headers=0 讓 Google API 強制將所有行數都視為資料回傳）
   const SPREADSHEET_ID = '1Wm27THRBQl4BKfgcfLH9OFXrhPhBj9FisKb1raTPnFc';
-  const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json`;
+  const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&headers=0`;
 
   const dataStore = {};
 
   function loadSheetData() {
     const script = document.createElement('script');
     
-    // 設定 JSONP 全域接收函式（繞過跨網域限制）
     window.google = window.google || {};
     window.google.visualization = window.google.visualization || {};
     window.google.visualization.Query = {
       setResponse: function(response) {
         try {
           if (!response || !response.table || !response.table.rows) {
-            throw new Error('資料格式不正確');
+            throw new Error('資料讀取失敗');
           }
 
           const rows = response.table.rows;
@@ -91,7 +90,7 @@
             }
           });
 
-          // 填入 QR Code 圖片
+          // 動態貼上圖片網址
           if (dataStore['ipass_qr']) document.getElementById('ipass_qr').src = dataStore['ipass_qr'];
           if (dataStore['linepay_qr']) document.getElementById('linepay_qr').src = dataStore['linepay_qr'];
           if (dataStore['pxpay_qr']) document.getElementById('pxpay_qr').src = dataStore['pxpay_qr'];
