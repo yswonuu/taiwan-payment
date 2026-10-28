@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>付款資訊 - 林*瑄</title>
+  <title>付款資訊 - 林○瑄</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background: #f5f5f7; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
@@ -16,13 +16,23 @@
     .ipass-color { color: #00aa4f; }
     .linepay-color { color: #00c73c; }
     .pxpay-color { color: #0055a5; }
+    .twqr-color { color: #c40000; }
     .qr-box img { max-width: 180px; width: 100%; height: auto; border-radius: 8px; margin-bottom: 12px; border: 1px solid #eee; min-height: 180px; background: #eee; object-fit: contain; }
+    .pay-item.no-btn .qr-box img { margin-bottom: 0; }
     .btn { background: #0071e3; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 500; width: 100%; }
     .btn:active { opacity: 0.8; }
     .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; }
     .loading { color: #86868b; font-size: 13px; margin-top: 6px; }
     footer { margin-top: 20px; padding-top: 16px; border-top: 1px solid #eee; }
     footer p { color: #86868b; font-size: 13px; font-weight: 500; }
+    
+    footer a {
+      color: inherit;
+      text-decoration: none;
+    }
+    footer a:hover {
+      opacity: 0.8;
+    }
   </style>
 </head>
 <body>
@@ -34,7 +44,7 @@
     <div id="status" class="loading">正在載入最新收款資料...</div>
   </div>
 
-  <!-- 1. iPASS MONEY -->
+
   <div class="pay-item">
     <div class="pay-title ipass-color">iPASS MONEY</div>
     <div class="qr-box">
@@ -43,7 +53,6 @@
     <button class="btn" onclick="copyText('ipass_no')">複製 iPASS MONEY 帳號</button>
   </div>
 
-  <!-- 2. LINE Pay -->
   <div class="pay-item">
     <div class="pay-title linepay-color">LINE Pay</div>
     <div class="qr-box">
@@ -52,7 +61,6 @@
     <button class="btn" onclick="copyText('linepay_no')">複製 LINE Pay 帳號</button>
   </div>
 
-  <!-- 3. 全支付 -->
   <div class="pay-item">
     <div class="pay-title pxpay-color">全支付</div>
     <div class="qr-box">
@@ -61,9 +69,15 @@
     <button class="btn" onclick="copyText('pxpay_no')">複製全支付帳號</button>
   </div>
 
-  <!-- 頁尾宣告 -->
+  <div class="pay-item no-btn">
+    <div class="pay-title twqr-color">TWQR</div>
+    <div class="qr-box">
+      <img id="twqr_qr" src="" alt="TWQR Code">
+    </div>
+  </div>
+
   <footer>
-    <p>@orange._.bts_613</p>
+    <p><a href="https://www.threads.com/@orange._.bts_613?igshid=NTc4MTIwNjQ2YQ==" target="_blank" class="link">@orange._.bts_613</a></p>
   </footer>
 </div>
 
@@ -74,7 +88,6 @@
 
   const dataStore = {};
 
-  // 全域回呼函式（接收 Apps Script 的 JSONP 回傳）
   window.handleData = function(data) {
     try {
       Object.assign(dataStore, data);
@@ -82,6 +95,7 @@
       if (dataStore['ipass_qr']) document.getElementById('ipass_qr').src = dataStore['ipass_qr'];
       if (dataStore['linepay_qr']) document.getElementById('linepay_qr').src = dataStore['linepay_qr'];
       if (dataStore['pxpay_qr']) document.getElementById('pxpay_qr').src = dataStore['pxpay_qr'];
+      if (dataStore['twqr_qr']) document.getElementById('twqr_qr').src = dataStore['twqr_qr'];
 
       document.getElementById('status').style.display = 'none';
     } catch (err) {
@@ -91,7 +105,6 @@
   };
 
   function loadSheetData() {
-    // 透過動態插入 <script> 標籤呼叫 JSONP（完全繞過 CORS 跨網域限制）
     const script = document.createElement('script');
     script.src = API_URL + '?callback=handleData';
     script.onerror = function() {
