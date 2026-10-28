@@ -1,78 +1,14 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>付款資訊 - 林*瑄</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: #f5f5f7; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-    .card { background: white; border-radius: 20px; padding: 24px; max-width: 420px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; }
-    .header { margin-bottom: 24px; }
-    .header h1 { font-size: 22px; color: #1d1d1f; margin-bottom: 6px; }
-    .header p { color: #86868b; font-size: 14px; }
-    .pay-item { background: #fafafa; border: 1px solid #e5e5e5; border-radius: 14px; padding: 18px; margin-bottom: 16px; }
-    .pay-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
-    .ipass-color { color: #00aa4f; }
-    .linepay-color { color: #00c73c; }
-    .pxpay-color { color: #0055a5; }
-    .qr-box img { max-width: 180px; width: 100%; height: auto; border-radius: 8px; margin-bottom: 12px; border: 1px solid #eee; min-height: 180px; background: #eee; object-fit: contain; }
-    .btn { background: #0071e3; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 500; width: 100%; }
-    .btn:active { opacity: 0.8; }
-    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; }
-    .loading { color: #86868b; font-size: 13px; margin-top: 6px; }
-  </style>
-</head>
-<body>
-
-<div class="card">
-  <div class="header">
-    <h1>付款資訊</h1>
-    <p>收款人：林*瑄</p>
-    <div id="status" class="loading">正在更新最新資料...</div>
-  </div>
-
-  <!-- 1. iPASS MONEY -->
-  <div class="pay-item">
-    <div class="pay-title ipass-color">iPASS MONEY</div>
-    <div class="qr-box">
-      <img id="ipass_qr" src="" alt="iPASS MONEY QR Code">
-    </div>
-    <button class="btn" onclick="copyText('ipass_no')">複製 iPASS MONEY 帳號</button>
-  </div>
-
-  <!-- 2. LINE Pay -->
-  <div class="pay-item">
-    <div class="pay-title linepay-color">LINE Pay</div>
-    <div class="qr-box">
-      <img id="linepay_qr" src="" alt="LINE Pay QR Code">
-    </div>
-    <button class="btn" onclick="copyText('linepay_no')">複製 LINE 好友連結</button>
-  </div>
-
-  <!-- 3. 全支付 -->
-  <div class="pay-item">
-    <div class="pay-title pxpay-color">全支付</div>
-    <div class="qr-box">
-      <img id="pxpay_qr" src="" alt="全支付 QR Code">
-    </div>
-    <button class="btn" onclick="copyText('pxpay_no')">複製全支付帳號</button>
-  </div>
-</div>
-
-<div id="toast" class="toast">已複製到剪貼簿</div>
-
 <script>
-  // 使用 Google Viz API 機制（自動繞過 CORS 跨網域限制）
-  const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRrmHYeJPcAS9wa99SP0hnWPTNkFQN2-erE3JcVelCICA7BHdM4P2TGFZguOaaruqrAyX7wEVG3G1DG/gviz/tq?tqx=out:json';
+  // 使用你剛剛提供的標準 Google 試算表 ID
+  const SPREADSHEET_ID = '1Wm27THRBQl4BKfgcfLH9OFXrhPhBj9FisKb1raTPnFc';
+  const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json`;
 
   const dataStore = {};
 
   function loadSheetData() {
-    // 透過 JSONP 動態載入腳本，確保任何瀏覽器與本機開啟皆能正常抓取
     const script = document.createElement('script');
     
-    // 全域回呼函式處理返回資料
+    // 設定 JSONP 全域接收函式（繞過跨網域限制）
     window.google = window.google || {};
     window.google.visualization = window.google.visualization || {};
     window.google.visualization.Query = {
@@ -106,7 +42,7 @@
 
     script.src = SHEET_URL;
     script.onerror = function() {
-      document.getElementById('status').innerText = '載入資料失敗，請確認試算表網路發布設定';
+      document.getElementById('status').innerText = '載入資料失敗，請確認試算表已開啟「知道連結者皆可檢視」共用權限';
     };
     document.body.appendChild(script);
   }
@@ -125,6 +61,3 @@
 
   loadSheetData();
 </script>
-
-</body>
-</html>
