@@ -1,359 +1,130 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>✨ 小卡商店</title>
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<style>
-body{
-    background:#fafdff;
-    font-family:Arial;
-}
-
-/* navbar */
-.navbar{
-    background:#fff;
-    box-shadow:0 2px 4px rgba(0,0,0,.05);
-}
-
-/* card */
-.card{
-    border:none;
-    border-radius:16px;
-    box-shadow:0 6px 12px rgba(0,0,0,.05);
-    overflow:hidden;
-    height:100%;
-}
-
-.product-img-wrapper{
-    aspect-ratio:2/3;
-    overflow:hidden;
-}
-
-.product-img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-}
-
-/* cart */
-.floating-cart-btn{
-    position:fixed;
-    bottom:25px;
-    right:25px;
-    width:65px;
-    height:65px;
-    background:#ff5b75;
-    color:#fff;
-    border-radius:50%;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:26px;
-    border:none;
-}
-
-.cart-badge{
-    position:absolute;
-    top:-2px;
-    right:-2px;
-    background:#fff;
-    color:#ff5b75;
-    border-radius:50%;
-    border:2px solid #ff5b75;
-    font-size:12px;
-    padding:2px 6px;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>付款資訊 - 林*瑄</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: #f5f5f7; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+    .card { background: white; border-radius: 20px; padding: 24px; max-width: 420px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; }
+    .header { margin-bottom: 24px; }
+    .header h1 { font-size: 22px; color: #1d1d1f; margin-bottom: 6px; }
+    .header p { color: #86868b; font-size: 14px; }
+    .pay-item { background: #fafafa; border: 1px solid #e5e5e5; border-radius: 14px; padding: 18px; margin-bottom: 16px; }
+    .pay-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+    .ipass-color { color: #00aa4f; }
+    .linepay-color { color: #00c73c; }
+    .pxpay-color { color: #0055a5; }
+    .qr-box img { max-width: 180px; width: 100%; height: auto; border-radius: 8px; margin-bottom: 12px; border: 1px solid #eee; min-height: 180px; background: #eee; object-fit: contain; }
+    .btn { background: #0071e3; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 500; width: 100%; }
+    .btn:active { opacity: 0.8; }
+    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; }
+    .loading { color: #86868b; font-size: 13px; margin-top: 6px; }
+  </style>
 </head>
-
 <body>
 
-<!-- NAV -->
-<nav class="navbar sticky-top">
-<div class="container d-flex justify-content-between align-items-center">
+<div class="card">
+  <div class="header">
+    <h1>付款資訊</h1>
+    <p>收款人：林*瑄</p>
+    <div id="status" class="loading">正在更新最新資料...</div>
+  </div>
 
-<div class="fw-bold text-danger">✨ 小卡商店</div>
-
-<!-- 桌機 -->
-<div id="auth-zone" class="d-none d-lg-flex gap-2">
-<input id="loginEmail" class="form-control form-control-sm" placeholder="Email" style="width:150px;">
-<input id="loginPwd" type="password" class="form-control form-control-sm" placeholder="密碼" style="width:120px;">
-<button class="btn btn-primary btn-sm" onclick="handleLogin()">登入</button>
-<button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#regModal">註冊</button>
-</div>
-
-<!-- 手機 -->
-<div id="mobile-auth" class="d-flex d-lg-none gap-2">
-<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#loginModal">登入</button>
-<button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#regModal">註冊</button>
-</div>
-
-<!-- 登入後 -->
-<div id="user-zone" class="d-none">
-🟢 <span id="current-user-name"></span>
-<button class="btn btn-sm btn-secondary" onclick="handleLogout()">登出</button>
-</div>
-
-</div>
-</nav>
-
-<!-- 商品 -->
-<div class="container mb-5">
-<h3 class="fw-bold my-3">🌟 現貨區</h3>
-
-    <div class="row row-cols-2 row-cols-md-5 g-3">
-
-        <div class="col">
-                <div class="card h-100">
-                    <div class="product-img-wrapper"><img src="https://i.pinimg.com/736x/14/fa/4c/14fa4c988aec277da04ce9392ce97e32.jpg" class="product-img" alt="Wonwoo"></div>
-                    <div class="card-body d-flex flex-column p-2">
-                        <h6 class="fw-bold mb-1" style="font-size: 14px;">Wonwoo</h6>
-                        <p class="text-muted flex-grow-1 mb-2" style="font-size: 12px;">UMS特典卡</p>
-                        <div class="d-flex justify-content-between align-items-center mt-auto">
-                            <span class="fw-bold text-danger">$350</span>
-                            <button class="btn btn-sm btn-primary" onclick="addToCart('Wonwoo回歸特典卡', 350)">🛒</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col">
-                <div class="card h-100">
-                    <div class="product-img-wrapper"><img src="https://i.pinimg.com/736x/30/87/21/3087214f40165a25e18ee79ca57170e6.jpg" class="product-img" alt="JK"></div>
-                    <div class="card-body d-flex flex-column p-2">
-                        <h6 class="fw-bold mb-1" style="font-size: 14px;">JK</h6>
-                        <p class="text-muted flex-grow-1 mb-2" style="font-size: 12px;">簽售特典卡</p>
-                        <div class="d-flex justify-content-between align-items-center mt-auto">
-                            <span class="fw-bold text-danger">$480</span>
-                            <button class="btn btn-sm btn-primary" onclick="addToCart('JK簽售特典卡', 480)">🛒</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col">
-                <div class="card h-100">
-                    <div class="product-img-wrapper"><img src="https://i.pinimg.com/1200x/f1/a1/8a/f1a18aa1e340c10c44614b74780d565e.jpg" class="product-img" alt="V"></div>
-                    <div class="card-body d-flex flex-column p-2">
-                        <h6 class="fw-bold mb-1" style="font-size: 14px;">V</h6>
-                        <p class="text-muted flex-grow-1 mb-2" style="font-size: 12px;">世巡入場卡</p>
-                        <div class="d-flex justify-content-between align-items-center mt-auto">
-                            <span class="fw-bold text-danger">$290</span>
-                            <button class="btn btn-sm btn-primary" onclick="addToCart('泰亨世巡入場卡', 290)">🛒</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col">
-                <div class="card h-100">
-                    <div class="product-img-wrapper"><img src="https://i.pinimg.com/736x/37/55/b9/3755b931cef706b327dda12c83395e2f.jpg" class="product-img" alt="DK"></div>
-                    <div class="card-body d-flex flex-column p-2">
-                        <h6 class="fw-bold mb-1" style="font-size: 14px;">DK</h6>
-                        <p class="text-muted flex-grow-1 mb-2" style="font-size: 12px;">周年紀念卡</p>
-                        <div class="d-flex justify-content-between align-items-center mt-auto">
-                            <span class="fw-bold text-danger">$550</span>
-                            <button class="btn btn-sm btn-primary" onclick="addToCart('DK周年紀念卡', 550)">🛒</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col">
-                <div class="card h-100">
-                    <div class="product-img-wrapper"><img src="https://i.pinimg.com/1200x/18/e4/56/18e456c39bffa1aa2ef7ca8ce3ab8462.jpg" class="product-img" alt="Jeonghan"></div>
-                    <div class="card-body d-flex flex-column p-2">
-                        <h6 class="fw-bold mb-1" style="font-size: 14px;">Jeonghan</h6>
-                        <p class="text-muted flex-grow-1 mb-2" style="font-size: 12px;">WVS特典卡</p>
-                        <div class="d-flex justify-content-between align-items-center mt-auto">
-                            <span class="fw-bold text-danger">$550</span>
-                            <button class="btn btn-sm btn-primary" onclick="addToCart('Jeonghan-WVS特典卡', 550)">🛒</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- 1. iPASS MONEY -->
+  <div class="pay-item">
+    <div class="pay-title ipass-color">iPASS MONEY</div>
+    <div class="qr-box">
+      <img id="ipass_qr" src="" alt="iPASS MONEY QR Code">
     </div>
-<!-- cart -->
-<button class="floating-cart-btn" data-bs-toggle="offcanvas" data-bs-target="#cart">
-🛒 <span id="cart-badge" class="cart-badge d-none">0</span>
-</button>
+    <button class="btn" onclick="copyText('ipass_no')">複製 iPASS MONEY 帳號</button>
+  </div>
 
-<div class="offcanvas offcanvas-end" id="cart">
-<div class="offcanvas-header bg-danger text-white">
-<h5>購物車</h5>
-<button class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
-</div>
+  <!-- 2. LINE Pay -->
+  <div class="pay-item">
+    <div class="pay-title linepay-color">LINE Pay</div>
+    <div class="qr-box">
+      <img id="linepay_qr" src="" alt="LINE Pay QR Code">
+    </div>
+    <button class="btn" onclick="copyText('linepay_no')">複製 LINE 好友連結</button>
+  </div>
 
-<div class="offcanvas-body">
-<div id="cart-list">空</div>
-<hr>
-總計：$<span id="total">0</span>
-<button class="btn btn-danger w-100 mt-3" onclick="checkout()">下單</button>
-</div>
-</div>
-
-<!-- 登入 Modal -->
-<div class="modal fade" id="loginModal">
-<div class="modal-dialog modal-sm">
-<div class="modal-content p-3">
-<input id="m_email" class="form-control mb-2" placeholder="Email">
-<input id="m_pwd" type="password" class="form-control mb-2" placeholder="密碼">
-<button class="btn btn-primary w-100" onclick="loginMobile()">登入</button>
-</div>
-</div>
+  <!-- 3. 全支付 -->
+  <div class="pay-item">
+    <div class="pay-title pxpay-color">全支付</div>
+    <div class="qr-box">
+      <img id="pxpay_qr" src="" alt="全支付 QR Code">
+    </div>
+    <button class="btn" onclick="copyText('pxpay_no')">複製全支付帳號</button>
+  </div>
 </div>
 
-<!-- 註冊 -->
-<div class="modal fade" id="regModal">
-<div class="modal-dialog modal-sm">
-<div class="modal-content p-3">
-<input id="r_name" class="form-control mb-2" placeholder="暱稱">
-<input id="r_email" class="form-control mb-2" placeholder="Email">
-<input id="r_phone" class="form-control mb-2" placeholder="電話">
-<input id="r_pwd" class="form-control mb-2" placeholder="密碼">
-<button class="btn btn-primary w-100" onclick="register()">註冊</button>
-</div>
-</div>
-</div>
+<div id="toast" class="toast">已複製到剪貼簿</div>
 
 <script>
-    const API = "https://script.google.com/macros/s/AKfycbwlxR9mNoFhhC-Tp7pHXtcIov9YECTOh8nAk3XKA69SoOhJRMYmIU4_ZT8jru-NDZQJTw/exec";
+  // 使用 Google Viz API 機制（自動繞過 CORS 跨網域限制）
+  const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRrmHYeJPcAS9wa99SP0hnWPTNkFQN2-erE3JcVelCICA7BHdM4P2TGFZguOaaruqrAyX7wEVG3G1DG/gviz/tq?tqx=out:json';
 
-    let user = null;
+  const dataStore = {};
 
-    /* 🔥 初始化：檢查 localStorage */
-    window.addEventListener("load", () => {
-        const saved = localStorage.getItem("user");
-        if (saved) {
-            user = JSON.parse(saved);
-            showUser();
+  function loadSheetData() {
+    // 透過 JSONP 動態載入腳本，確保任何瀏覽器與本機開啟皆能正常抓取
+    const script = document.createElement('script');
+    
+    // 全域回呼函式處理返回資料
+    window.google = window.google || {};
+    window.google.visualization = window.google.visualization || {};
+    window.google.visualization.Query = {
+      setResponse: function(response) {
+        try {
+          if (!response || !response.table || !response.table.rows) {
+            throw new Error('資料格式不正確');
+          }
+
+          const rows = response.table.rows;
+          rows.forEach(row => {
+            if (row.c && row.c[0] && row.c[1]) {
+              const key = String(row.c[0].v || '').trim();
+              const val = String(row.c[1].v || '').trim();
+              dataStore[key] = val;
+            }
+          });
+
+          // 填入 QR Code 圖片
+          if (dataStore['ipass_qr']) document.getElementById('ipass_qr').src = dataStore['ipass_qr'];
+          if (dataStore['linepay_qr']) document.getElementById('linepay_qr').src = dataStore['linepay_qr'];
+          if (dataStore['pxpay_qr']) document.getElementById('pxpay_qr').src = dataStore['pxpay_qr'];
+
+          document.getElementById('status').style.display = 'none';
+        } catch (err) {
+          console.error(err);
+          document.getElementById('status').innerText = '讀取資料失敗，請確認試算表格式';
         }
-    });
+      }
+    };
 
-    /* 🔑 LOGIN（桌機 + 手機共用） */
-    async function handleLogin(){
+    script.src = SHEET_URL;
+    script.onerror = function() {
+      document.getElementById('status').innerText = '載入資料失敗，請確認試算表網路發布設定';
+    };
+    document.body.appendChild(script);
+  }
 
-        const email = document.getElementById("loginEmail").value;
-        const pwd = document.getElementById("loginPwd").value;
-
-        const fd = new URLSearchParams();
-        fd.append("type","login");
-        fd.append("email",email);
-        fd.append("pwd",pwd);
-
-        const res = await fetch(API,{method:"POST",body:fd});
-        const r = await res.json();
-
-        if(r.success){
-
-            user = { name:r.name, email };
-
-            localStorage.setItem("user", JSON.stringify(user));
-
-            showUser();
-
-            alert("登入成功");
-        }else{
-            alert(r.message);
-        }
+  function copyText(key) {
+    const val = dataStore[key];
+    if (!val) {
+      alert('尚無可複製的內容');
+      return;
     }
+    navigator.clipboard.writeText(val);
+    const toast = document.getElementById('toast');
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.display = 'none'; }, 2000);
+  }
 
-    /* 👤 顯示登入後 UI */
-    function showUser(){
-
-        document.getElementById("auth-zone").classList.add("d-none");
-        document.getElementById("mobile-auth").classList.add("d-none");
-        document.getElementById("user-zone").classList.remove("d-none");
-
-        document.getElementById("current-user-name").innerText = user.name;
-    }
-
-    /* 🚪 登出 */
-    function handleLogout(){
-
-        user = null;
-        localStorage.removeItem("user");
-
-        document.getElementById("auth-zone").classList.remove("d-none");
-        document.getElementById("mobile-auth").classList.remove("d-none");
-        document.getElementById("user-zone").classList.add("d-none");
-    }
-
-    /* 📝 註冊 */
-    async function register(){
-
-        const fd = new URLSearchParams();
-        fd.append("type","register");
-        fd.append("name",document.getElementById("r_name").value);
-        fd.append("email",document.getElementById("r_email").value);
-        fd.append("phone",document.getElementById("r_phone").value);
-        fd.append("pwd",document.getElementById("r_pwd").value);
-
-        await fetch(API,{method:"POST",body:fd});
-
-        alert("註冊成功");
-    }
-
-    /* 🛒 購物車 */
-    let cart = [];
-
-    function addToCart(name, price){
-
-        let item = cart.find(i=>i.name===name);
-
-        if(item) item.qty++;
-        else cart.push({name,price,qty:1});
-
-        renderCart();
-    }
-
-    function renderCart(){
-
-        let html = "";
-        let total = 0;
-        let qty = 0;
-
-        cart.forEach(i=>{
-            html += `<div>${i.name} x${i.qty}</div>`;
-            total += i.price*i.qty;
-            qty += i.qty;
-        });
-
-        document.getElementById("cart-list").innerHTML = html;
-        document.getElementById("total").innerText = total;
-
-        const badge = document.getElementById("cart-badge");
-        badge.innerText = qty;
-        badge.classList.remove("d-none");
-    }
-
-    /* 📦 下單（Google Sheet） */
-    async function checkout(){
-
-        if(!user) return alert("先登入");
-        if(cart.length===0) return alert("購物車是空的");
-
-        const fd = new URLSearchParams();
-        fd.append("type","order");
-        fd.append("buyerEmail",user.email);
-        fd.append("cartItems",JSON.stringify(cart));
-        fd.append("total",document.getElementById("total").innerText);
-
-        await fetch(API,{method:"POST",body:fd});
-
-        alert("下單成功");
-
-        cart = [];
-        renderCart();
-    }
+  loadSheetData();
 </script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
