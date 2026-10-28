@@ -21,6 +21,8 @@
     .btn:active { opacity: 0.8; }
     .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; }
     .loading { color: #86868b; font-size: 13px; margin-top: 6px; }
+    footer { margin-top: 20px; padding-top: 16px; border-top: 1px solid #eee; }
+    footer p { color: #86868b; font-size: 13px; font-weight: 500; }
   </style>
 </head>
 <body>
@@ -28,7 +30,7 @@
 <div class="card">
   <div class="header">
     <h1>付款資訊</h1>
-    <p>收款人：林*瑄</p>
+    <p>收款人：林○瑄</p>
     <div id="status" class="loading">正在載入最新收款資料...</div>
   </div>
 
@@ -58,54 +60,42 @@
     </div>
     <button class="btn" onclick="copyText('pxpay_no')">複製全支付帳號</button>
   </div>
+
+  <!-- 頁尾宣告 -->
+  <footer>
+    <p>@orange._.bts_613</p>
+  </footer>
 </div>
 
 <div id="toast" class="toast">已複製到剪貼簿</div>
 
 <script>
-  // 你的試算表 ID（加上 headers=0 讓 Google API 強制將所有行數都視為資料回傳）
-  const SPREADSHEET_ID = '1Wm27THRBQl4BKfgcfLH9OFXrhPhBj9FisKb1raTPnFc';
-  const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&headers=0`;
+  const API_URL = 'https://script.google.com/macros/s/AKfycbypB1zdL8UqyWL2PEz9Z2InxRQAV-BnzOgGQhx51GOFUQE5pYZ_gThGY3eQbRSjMxSd/exec';
 
   const dataStore = {};
 
+  // 全域回呼函式（接收 Apps Script 的 JSONP 回傳）
+  window.handleData = function(data) {
+    try {
+      Object.assign(dataStore, data);
+
+      if (dataStore['ipass_qr']) document.getElementById('ipass_qr').src = dataStore['ipass_qr'];
+      if (dataStore['linepay_qr']) document.getElementById('linepay_qr').src = dataStore['linepay_qr'];
+      if (dataStore['pxpay_qr']) document.getElementById('pxpay_qr').src = dataStore['pxpay_qr'];
+
+      document.getElementById('status').style.display = 'none';
+    } catch (err) {
+      console.error(err);
+      document.getElementById('status').innerText = '解析資料失敗';
+    }
+  };
+
   function loadSheetData() {
+    // 透過動態插入 <script> 標籤呼叫 JSONP（完全繞過 CORS 跨網域限制）
     const script = document.createElement('script');
-    
-    window.google = window.google || {};
-    window.google.visualization = window.google.visualization || {};
-    window.google.visualization.Query = {
-      setResponse: function(response) {
-        try {
-          if (!response || !response.table || !response.table.rows) {
-            throw new Error('資料讀取失敗');
-          }
-
-          const rows = response.table.rows;
-          rows.forEach(row => {
-            if (row.c && row.c[0] && row.c[1]) {
-              const key = String(row.c[0].v || '').trim();
-              const val = String(row.c[1].v || '').trim();
-              dataStore[key] = val;
-            }
-          });
-
-          // 動態貼上圖片網址
-          if (dataStore['ipass_qr']) document.getElementById('ipass_qr').src = dataStore['ipass_qr'];
-          if (dataStore['linepay_qr']) document.getElementById('linepay_qr').src = dataStore['linepay_qr'];
-          if (dataStore['pxpay_qr']) document.getElementById('pxpay_qr').src = dataStore['pxpay_qr'];
-
-          document.getElementById('status').style.display = 'none';
-        } catch (err) {
-          console.error(err);
-          document.getElementById('status').innerText = '讀取資料失敗，請確認試算表格式';
-        }
-      }
-    };
-
-    script.src = SHEET_URL;
+    script.src = API_URL + '?callback=handleData';
     script.onerror = function() {
-      document.getElementById('status').innerText = '載入資料失敗，請確認試算表已開啟「知道連結者皆可檢視」共用權限';
+      document.getElementById('status').innerText = '載入資料失敗，請確認 Apps Script 部署設定';
     };
     document.body.appendChild(script);
   }
