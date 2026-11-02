@@ -3,129 +3,161 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>付款資訊 - 林○瑄</title>
+  <title>快速付款 / 收款</title>
   <style>
+    :root {
+      --bg-color: #f4f6f8;
+      --card-bg: #ffffff;
+      --primary-color: #2563eb;
+      --text-main: #1f2937;
+      --text-sub: #6b7280;
+      --border-color: #e5e7eb;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: #f5f5f7; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-    .card { background: white; border-radius: 20px; padding: 24px; max-width: 420px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; }
-    .header { margin-bottom: 24px; }
-    .header h1 { font-size: 22px; color: #1d1d1f; margin-bottom: 6px; }
-    .header p { color: #86868b; font-size: 14px; }
-    .pay-item { background: #fafafa; border: 1px solid #e5e5e5; border-radius: 14px; padding: 18px; margin-bottom: 16px; }
-    .pay-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
-    .ipass-color { color: #00aa4f; }
-    .linepay-color { color: #00c73c; }
-    .pxpay-color { color: #0055a5; }
-    .twqr-color { color: #c40000; }
-    .qr-box img { max-width: 180px; width: 100%; height: auto; border-radius: 8px; margin-bottom: 12px; border: 1px solid #eee; min-height: 180px; background: #eee; object-fit: contain; }
-    .pay-item.no-btn .qr-box img { margin-bottom: 0; }
-    .btn { background: #0071e3; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 500; width: 100%; }
-    .btn:active { opacity: 0.8; }
-    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; }
-    .loading { color: #86868b; font-size: 13px; margin-top: 6px; }
-    footer { margin-top: 20px; padding-top: 16px; border-top: 1px solid #eee; }
-    footer p { color: #86868b; font-size: 13px; font-weight: 500; }
+    body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; padding: 20px 16px; min-height: 100vh; }
     
-    footer a {
-      color: inherit;
-      text-decoration: none;
-    }
-    footer a:hover {
-      opacity: 0.8;
-    }
+    .container { width: 100%; max-width: 420px; }
+    .header { text-align: center; margin-bottom: 24px; }
+    .header h1 { font-size: 1.4rem; font-weight: 700; color: var(--text-main); }
+    .header p { font-size: 0.9rem; color: var(--text-sub); margin-top: 6px; }
+
+    .card { background: var(--card-bg); border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
+    .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+    
+    .info-group { background: #f9fafb; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 16px; margin-bottom: 12px; }
+    .info-label { font-size: 0.8rem; color: var(--text-sub); margin-bottom: 4px; }
+    .info-val { font-size: 1.05rem; font-weight: 700; color: var(--text-main); }
+
+    .btn-group { display: flex; gap: 10px; margin-top: 12px; }
+    .btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background 0.2s; text-align: center; text-decoration: none; display: inline-block; }
+    .btn-primary { background: var(--primary-color); color: #fff; }
+    .btn-primary:active { opacity: 0.9; }
+    .btn-outline { background: #fff; border: 1px solid var(--border-color); color: var(--text-main); }
+    .btn-outline:active { background: #f3f4f6; }
+
+    /* 品牌專屬按鈕顏色 */
+    .btn-ipass { background: #e11d48; color: #fff; }
+    .btn-pxpay { background: #1e3a8a; color: #fff; }
+    .btn-form { background: #0d9488; color: #fff; }
+
+    /* Toast 複製成功提示 */
+    #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.85); color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 0.85rem; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 99; }
+    #toast.show { opacity: 1; }
   </style>
 </head>
 <body>
 
-<div class="card">
+<div class="container">
   <div class="header">
-    <h1>付款資訊</h1>
-    <p>收款人：林○瑄<br>請輸入正確金額再進行匯款</p>
-    <div id="status" class="loading">正在載入最新收款資料...</div>
+    <h1>請選擇付款方式</h1>
+    <p>點擊按鈕自動複製帳號並開啟對應 App<br>請輸入正確金額再進行匯款<br>收款人：林○瑄</p>
   </div>
 
-
-  <div class="pay-item">
-    <div class="pay-title ipass-color">iPASS MONEY</div>
-    <div class="qr-box">
-      <img id="ipass_qr" src="" alt="iPASS MONEY QR Code">
+  <!-- 銀行轉帳區塊 -->
+  <div class="card">
+    <div class="card-title">
+      <span>銀行轉帳</span>
     </div>
-    <button class="btn" onclick="copyText('ipass_no')">複製 iPASS MONEY 帳號</button>
-  </div>
-
-  <div class="pay-item">
-    <div class="pay-title linepay-color">LINE Pay</div>
-    <div class="qr-box">
-      <img id="linepay_qr" src="" alt="LINE Pay QR Code">
+    
+    <div class="info-group">
+      <div class="info-label">收款銀行</div>
+      <!-- 僅顯示銀行名稱與代碼，隱藏實際帳號號碼 -->
+      <div class="info-val">彰化銀行 (009)</div>
     </div>
-    <button class="btn" onclick="copyText('linepay_no')">複製 LINE Pay 帳號</button>
-  </div>
 
-  <div class="pay-item">
-    <div class="pay-title pxpay-color">全支付</div>
-    <div class="qr-box">
-      <img id="pxpay_qr" src="" alt="全支付 QR Code">
-    </div>
-    <button class="btn" onclick="copyText('pxpay_no')">複製全支付帳號</button>
-  </div>
-
-  <div class="pay-item no-btn">
-    <div class="pay-title twqr-color">TWQR</div>
-    <div class="qr-box">
-      <img id="twqr_qr" src="" alt="TWQR Code">
+    <div class="btn-group">
+      <!-- 請將下方 '你的銀行帳號' 替換為實際的銀行帳號數字 -->
+      <button class="btn btn-outline" onclick="copyText('97385002224100')">僅複製帳號</button>
+      <button class="btn btn-primary" onclick="copyAndOpen('97385002224100', 'taishinbank://')">複製並開啟 App</button>
     </div>
   </div>
 
-  <footer>
-    <p><a href="https://www.threads.com/@orange._.bts_613?igshid=NTc4MTIwNjQ2YQ==" target="_blank" class="link">@orange._.bts_613</a></p>
-  </footer>
+ <div class="card">
+    <div class="card-title">
+      <span>電子支付 / 行動支付</span>
+    </div>
+
+    <div class="btn-group" style="flex-direction: column;">
+      <!-- iPASS MONEY：請將 '你的iPASSMONEY帳號' 替換為你的電支帳號/手機號碼 -->
+      <button class="btn btn-ipass" onclick="copyAndOpen('0000002549274902', 'https://apps.apple.com/app/id1664639200')">
+        複製帳號並開啟 iPASS MONEY
+      </button>
+      
+      <!-- 全支付：請將 '你的全支付帳號' 替換為你的全支付帳號/手機號碼 -->
+      <button class="btn btn-pxpay" onclick="copyAndOpen('11016056526470', 'https://service.pxpayplus.com/pxplus_redirect/page_redirect/jumj?memberCode=MC17410163&amount=0')">
+        複製帳號並開啟 全支付 App
+      </button>
+    </div>
+  </div>
+
+  <!-- 匯款完成回報區塊（表單 + LINE） -->
+  <div class="card" style="text-align: center;">
+    <div class="card-title" style="justify-content: center;">
+      <span>匯款完成回報</span>
+    </div>
+    <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 14px;">
+      轉帳完成後，請填寫對帳表單並上傳截圖，或透過 LINE 私訊通知。
+    </p>
+    
+    <div class="btn-group" style="flex-direction: column;">
+      <!-- 請將下方 href 網址替換為你的 Google 表單連結 -->
+      <a href="https://forms.gle/your-google-form-link" class="btn btn-form" target="_blank">
+        📋 填寫對帳表單（上傳截圖）
+      </a>
+      
+      <!-- 請將下方 href 網址替換為你的 LINE 連結 -->
+      <a href="https://line.me/ti/p/your-line-id" class="btn btn-outline" target="_blank">
+        💬 私訊 LINE 傳送截圖
+      </a>
+    </div>
+  </div>
 </div>
 
-<div id="toast" class="toast">已複製到剪貼簿</div>
+<div id="toast">帳號已複製到剪貼簿</div>
 
 <script>
-  const API_URL = 'https://script.google.com/macros/s/AKfycbypB1zdL8UqyWL2PEz9Z2InxRQAV-BnzOgGQhx51GOFUQE5pYZ_gThGY3eQbRSjMxSd/exec';
-
-  const dataStore = {};
-
-  window.handleData = function(data) {
-    try {
-      Object.assign(dataStore, data);
-
-      if (dataStore['ipass_qr']) document.getElementById('ipass_qr').src = dataStore['ipass_qr'];
-      if (dataStore['linepay_qr']) document.getElementById('linepay_qr').src = dataStore['linepay_qr'];
-      if (dataStore['pxpay_qr']) document.getElementById('pxpay_qr').src = dataStore['pxpay_qr'];
-      if (dataStore['twqr_qr']) document.getElementById('twqr_qr').src = dataStore['twqr_qr'];
-
-      document.getElementById('status').style.display = 'none';
-    } catch (err) {
-      console.error(err);
-      document.getElementById('status').innerText = '解析資料失敗';
+  // 複製文字功能
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast("帳號已複製！請至銀行 App 貼上");
+      }).catch(() => {
+        fallbackCopy(text);
+      });
+    } else {
+      fallbackCopy(text);
     }
-  };
-
-  function loadSheetData() {
-    const script = document.createElement('script');
-    script.src = API_URL + '?callback=handleData';
-    script.onerror = function() {
-      document.getElementById('status').innerText = '載入資料失敗，請確認 Apps Script 部署設定';
-    };
-    document.body.appendChild(script);
   }
 
-  function copyText(key) {
-    const val = dataStore[key];
-    if (!val) {
-      alert('尚無可複製的內容');
-      return;
-    }
-    navigator.clipboard.writeText(val);
+  // 舊版瀏覽器複製備案
+  function fallbackCopy(text) {
+    const input = document.createElement('input');
+    input.value = text;
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand('copy');
+    document.body.removeChild(input);
+    showToast("帳號已複製！請至銀行 App 貼上");
+  }
+
+  // 複製並開啟 App
+  function copyAndOpen(text, appScheme) {
+    copyText(text);
+    setTimeout(() => {
+      window.location.href = appScheme;
+    }, 600);
+  }
+
+  // Toast 提示顯示邏輯
+  function showToast(msg) {
     const toast = document.getElementById('toast');
-    toast.style.display = 'block';
-    setTimeout(() => { toast.style.display = 'none'; }, 2000);
+    toast.innerText = msg;
+    toast.classList.add('show');
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 2200);
   }
-
-  loadSheetData();
 </script>
 
 </body>
