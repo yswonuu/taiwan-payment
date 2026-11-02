@@ -15,9 +15,9 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; padding: 20px 16px; min-height: 100vh; }
+    body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px 16px; min-height: 100vh; }
     
-    .container { width: 100%; max-width: 420px; }
+    .container { width: 100%; max-width: 420px; flex: 1; }
     .header { text-align: center; margin-bottom: 24px; }
     .header h1 { font-size: 1.4rem; font-weight: 700; color: var(--text-main); }
     .header p { font-size: 0.9rem; color: var(--text-sub); margin-top: 6px; }
@@ -30,7 +30,7 @@
     .info-val { font-size: 1.05rem; font-weight: 700; color: var(--text-main); }
 
     .btn-group { display: flex; gap: 10px; margin-top: 12px; }
-    .btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background 0.2s; text-align: center; text-decoration: none; display: inline-block; }
+    .btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background 0.2s, opacity 0.2s; text-align: center; text-decoration: none; display: inline-block; }
     .btn-primary { background: var(--primary-color); color: #fff; }
     .btn-primary:active { opacity: 0.9; }
     .btn-outline { background: #fff; border: 1px solid var(--border-color); color: var(--text-main); }
@@ -39,6 +39,29 @@
     .btn-ipass { background: #e11d48; color: #fff; }
     .btn-pxpay { background: #1e3a8a; color: #fff; }
     .btn-form { background: #0d9488; color: #fff; }
+
+    /* Footer 樣式優化 */
+    footer {
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      padding: 16px 0 8px;
+      margin-top: auto;
+    }
+    footer p {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+    }
+    footer .link {
+      color: var(--text-sub);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    footer .link:hover {
+      color: var(--primary-color);
+      text-decoration: underline;
+    }
 
     #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.85); color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 0.85rem; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 99; }
     #toast.show { opacity: 1; }
@@ -67,7 +90,7 @@
     </div>
   </div>
 
- <div class="card">
+  <div class="card">
     <div class="card-title">
       <span>電子支付 / 行動支付</span>
     </div>
@@ -99,13 +122,17 @@
   </div>
 </div>
 
+<footer>
+    <p>如有問題請聯絡：<a href="https://www.threads.com/@orange._.bts_613?igshid=NTc4MTIwNjQ2YQ==" target="_blank" class="link">@orange._.bts_613</a></p>
+</footer>
+
 <div id="toast">帳號已複製到剪貼簿</div>
 
 <script>
   function copyText(text) {
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard.writeText(text).then(() => {
-        showToast("帳號已複製！請至銀行 App 貼上");
+        showToast("帳號已複製！請至 App 貼上");
       }).catch(() => {
         fallbackCopy(text);
       });
@@ -121,7 +148,7 @@
     input.select();
     document.execCommand('copy');
     document.body.removeChild(input);
-    showToast("帳號已複製！請至銀行 App 貼上");
+    showToast("帳號已複製！請至 App 貼上");
   }
 
   function copyAndOpen(text, appScheme) {
