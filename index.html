@@ -36,12 +36,10 @@
     .btn-outline { background: #fff; border: 1px solid var(--border-color); color: var(--text-main); }
     .btn-outline:active { background: #f3f4f6; }
 
-    /* 品牌專屬按鈕顏色 */
     .btn-ipass { background: #e11d48; color: #fff; }
     .btn-pxpay { background: #1e3a8a; color: #fff; }
     .btn-form { background: #0d9488; color: #fff; }
 
-    /* Toast 複製成功提示 */
     #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.85); color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 0.85rem; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 99; }
     #toast.show { opacity: 1; }
   </style>
@@ -54,7 +52,6 @@
     <p>點擊按鈕自動複製帳號並開啟對應 App<br>請輸入正確金額再進行匯款<br>收款人：林○瑄</p>
   </div>
 
-  <!-- 銀行轉帳區塊 -->
   <div class="card">
     <div class="card-title">
       <span>銀行轉帳</span>
@@ -62,12 +59,10 @@
     
     <div class="info-group">
       <div class="info-label">收款銀行</div>
-      <!-- 僅顯示銀行名稱與代碼，隱藏實際帳號號碼 -->
       <div class="info-val">彰化銀行 (009)</div>
     </div>
 
     <div class="btn-group">
-      <!-- 請將下方 '你的銀行帳號' 替換為實際的銀行帳號數字 -->
       <button class="btn btn-outline" onclick="copyText('97385002224100')">僅複製帳號</button>
     </div>
   </div>
@@ -78,30 +73,27 @@
     </div>
 
     <div class="btn-group" style="flex-direction: column;">
-      <!-- iPASS MONEY：請將 '你的iPASSMONEY帳號' 替換為你的電支帳號/手機號碼 -->
       <button class="btn btn-ipass" onclick="copyAndOpen('0000002549274902', 'https://apps.apple.com/app/id1664639200')">
         複製帳號並開啟 iPASS MONEY
       </button>
       
-      <!-- 全支付：請將 '你的全支付帳號' 替換為你的全支付帳號/手機號碼 -->
       <button class="btn btn-pxpay" onclick="copyAndOpen('11016056526470', 'https://apps.apple.com/tw/app/%E5%85%A8%E6%94%AF%E4%BB%98/id1605910655')">
         複製帳號並開啟 全支付 App
       </button>
     </div>
   </div>
 
-  <!-- 匯款完成回報區塊（表單 + LINE） -->
   <div class="card" style="text-align: center;">
     <div class="card-title" style="justify-content: center;">
       <span>匯款完成回報</span>
     </div>
     <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 14px;">
-      轉帳完成後，請填寫對帳表單並上傳截圖。
+      轉帳完成後，請填寫表單並上傳截圖。
     </p>
     
     <div class="btn-group" style="flex-direction: column;">
       <a href="https://forms.gle/Csw1rvB9bjXESnUa9" class="btn btn-form" target="_blank">
-        📋 填寫對帳表單（上傳截圖）
+        📋 填寫表單
       </a>
     </div>
   </div>
@@ -110,7 +102,6 @@
 <div id="toast">帳號已複製到剪貼簿</div>
 
 <script>
-  // 複製文字功能
   function copyText(text) {
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard.writeText(text).then(() => {
@@ -123,7 +114,6 @@
     }
   }
 
-  // 舊版瀏覽器複製備案
   function fallbackCopy(text) {
     const input = document.createElement('input');
     input.value = text;
@@ -134,7 +124,6 @@
     showToast("帳號已複製！請至銀行 App 貼上");
   }
 
-  // 複製並開啟 App
   function copyAndOpen(text, appScheme) {
     copyText(text);
     setTimeout(() => {
@@ -142,7 +131,6 @@
     }, 600);
   }
 
-  // Toast 提示顯示邏輯
   function showToast(msg) {
     const toast = document.getElementById('toast');
     toast.innerText = msg;
